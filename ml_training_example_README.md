@@ -123,7 +123,7 @@ After running the training script, Omni Profiler will output detailed profiling 
 
 #### Overall Profiling Report
 
-![Overall Profiling Report](https://raw.githubusercontent.com/yourusername/your-repo-name/main/images/overall_profiling_report.png)
+![Overall Profiling Report](assets/overall.png)
 
 This image shows the overall time spent in each profiled function, giving you a high-level view of where your code is spending the most time.
 
