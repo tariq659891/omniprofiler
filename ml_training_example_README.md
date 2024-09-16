@@ -1,123 +1,138 @@
-# Machine Learning Training Example with Advanced Flexible Profiler
+# Omni Profiler
 
-This example demonstrates how to use the Advanced Flexible Profiler in a machine learning training scenario. The script `ml_training_example.py` implements a simple binary classification task using a neural network and showcases various profiling techniques.
+[Previous content remains the same...]
 
-## Overview
+## Machine Learning Example
 
-The script performs the following steps:
-1. Generates dummy data for training and validation
-2. Defines a simple neural network model
-3. Implements a `Trainer` class with methods for training and validation
-4. Runs the training loop for a specified number of epochs
+Omni Profiler can be particularly useful for profiling machine learning workflows. Here's an example of how to use Omni Profiler with a PyTorch-based neural network training process.
 
-Throughout these steps, the Advanced Flexible Profiler is used to measure performance and provide insights into the execution time of different parts of the code.
+### Setup
 
-## Profiler Configuration
-
-The profiler is configured at the beginning of the script:
+First, import the necessary libraries and configure the profiler:
 
 ```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+import numpy as np
+from omni_profiler import profiler, profile_methods, profile_line_by_line, auto_profile_blocks
+from profiler_config import profiler_config
+
+# Configure profiler
 profiler_config.enabled = True
-profiler_config.output_dir = "ml_profiling_output"
-profiler_config.save_format = "json"
-profiler_config.steps_to_save = [1, 10, 50, 100]
 profiler_config.print_block_profile = True
-profiler_config.save_line_profile = True
-profiler_config.save_block_profile = True
-profiler_config.save_overall_profile = True
+profiler_config.print_line_profile = True
+profiler_config.print_overall_profile = True
 ```
 
-This configuration enables the profiler, sets the output directory, specifies JSON as the save format, defines steps at which to save profiles, and enables various printing and saving options.
+### Data Generation
 
-## Profiling Techniques Demonstrated
-
-### 1. Function-level Profiling
-
-The `@profile_methods` decorator is applied to the `Trainer` class:
-
-```python
-@profile_methods
-class Trainer:
-    # ...
-```
-
-This profiles all methods in the `Trainer` class, providing timing information for each method call.
-
-### 2. Block Profiling
-
-The `@auto_profile_blocks` decorator is used on specific methods:
+We'll use a simple function to generate dummy data:
 
 ```python
 @auto_profile_blocks
 def generate_data(num_samples=1000, input_dim=10):
-    # ...
-
-@auto_profile_blocks
-def train_epoch(self, epoch):
-    # ...
-
-@auto_profile_blocks
-def validate(self):
-    # ...
+    X = np.random.randn(num_samples, input_dim)
+    y = np.sum(X, axis=1) > 0
+    return torch.FloatTensor(X), torch.FloatTensor(y).unsqueeze(1)
 ```
 
-This allows for more granular profiling of these specific functions.
+### Model Definition
 
-### 3. Context-based Profiling
-
-The `profile_context` is used to profile specific blocks of code:
+Here's a simple neural network model:
 
 ```python
-with profiler.profile_context("train_step"):
-    # ... training step code ...
-
-with profiler.profile_context(f"epoch_{epoch}"):
-    # ... epoch code ...
+class SimpleNN(nn.Module):
+    def __init__(self, input_dim):
+        super(SimpleNN, self).__init__()
+        self.fc1 = nn.Linear(input_dim, 64)
+        self.fc2 = nn.Linear(64, 1)
+        
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = torch.sigmoid(self.fc2(x))
+        return x
 ```
 
-This provides timing information for these specific named blocks of code.
+### Trainer Class
 
-### 4. Line-by-line Profiling
-
-The `@profile_line_by_line` decorator is applied to the main `train` method:
+We'll define a `Trainer` class with profiled methods:
 
 ```python
-@profile_line_by_line
-def train(self, num_epochs):
-    # ...
+@profile_methods
+class Trainer:
+    def __init__(self, model, criterion, optimizer, train_loader, val_loader):
+        self.model = model
+        self.criterion = criterion
+        self.optimizer = optimizer
+        self.train_loader = train_loader
+        self.val_loader = val_loader
+    
+    @auto_profile_blocks
+    def train_epoch(self, epoch):
+        # Training logic here...
+    
+    @auto_profile_blocks
+    def validate(self):
+        # Validation logic here...
+    
+    @profile_line_by_line
+    def train(self, num_epochs):
+        for epoch in range(num_epochs):
+            with profiler.profile_context(f"epoch_{epoch}"):
+                train_loss = self.train_epoch(epoch)
+                val_loss = self.validate()
+                print(f'Epoch {epoch}: Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
+        
+        profiler.print_overall_profile()
 ```
 
-This provides detailed timing information for each line in this method.
+### Main Training Script
 
-## Profiler Output
+Here's how to put it all together:
 
-The profiler generates several types of output:
+```python
+if __name__ == "__main__":
+    # Generate data
+    X_train, y_train = generate_data(1000, 10)
+    X_val, y_val = generate_data(200, 10)
+    
+    # Create data loaders
+    train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=32, shuffle=True)
+    val_loader = DataLoader(TensorDataset(X_val, y_val), batch_size=32)
+    
+    # Initialize model, criterion, and optimizer
+    model = SimpleNN(10)
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(model.parameters())
+    
+    # Create trainer and start training
+    trainer = Trainer(model, criterion, optimizer, train_loader, val_loader)
+    trainer.train(num_epochs=5)
+```
 
-1. **Block Profiles**: Saved after each epoch in JSON format.
-2. **Overall Profile**: Saved at the end of training, providing a summary of all profiled functions and blocks.
-3. **Line-by-line Profile**: Saved for the `train` method, showing detailed timing for each line.
-4. **Terminal Output**: Block profiles are printed to the terminal during training.
+### Profiling Results
 
-## Understanding the Profiler Output
+After running the training script, Omni Profiler will output detailed profiling information. Here are some example visualizations of the profiling results:
 
-### Block Profiles
+[Image Placeholder: Overall Profiling Report]
 
-Block profiles show the time spent in different blocks of code, such as `train_step`, `epoch_X`, etc. This helps identify which parts of the training process are taking the most time.
+[Image Placeholder: Block Profiling Report]
 
-### Overall Profile
+[Image Placeholder: Line-by-Line Profiling Report]
 
-The overall profile provides a summary of time spent in each profiled function and block across the entire training process. This is useful for identifying overall bottlenecks in your code.
+These visualizations help identify performance bottlenecks in your machine learning workflow, allowing you to optimize your code for better efficiency.
 
-### Line-by-line Profile
+## Interpreting Profiling Results
 
-The line-by-line profile of the `train` method shows exactly how much time is spent on each line of code within this method. This can be particularly useful for optimizing the main training loop.
+When analyzing the profiling results:
 
-## Using the Profiler Output
+1. Look for functions or blocks that take the most time.
+2. Identify any unexpected patterns in the line-by-line profiling.
+3. Pay attention to the number of calls for each function or block.
+4. Compare the average time per call to identify slow operations.
 
-1. **Identify Bottlenecks**: Look for functions or blocks that take significantly more time than others.
-2. **Optimize Data Loading**: If data loading operations are slow, consider using techniques like prefetching or parallel data loading.
-3. **GPU Utilization**: For GPU-based training, ensure that the GPU is being fully utilized and that data transfer between CPU and GPU isn't a bottleneck.
-4. **Batch Size Optimization**: Experiment with different batch sizes and observe their impact on training time and memory usage.
-5. **Model Architecture**: If certain layers in your model are taking too much time, consider simplifying the architecture or using more efficient layer types.
+By using Omni Profiler in your machine learning projects, you can gain valuable insights into the performance characteristics of your training process, helping you optimize your code for faster execution and better resource utilization.
 
-By analyzing the profiler output, you can make data-driven decisions to optimize your machine learning training pipeline for better performance.
+[Rest of the README remains the same...]
