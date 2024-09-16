@@ -9,15 +9,21 @@ The Advanced Flexible Profiler is a powerful and customizable profiling tool des
 - Line-by-line profiling
 - Flexible configuration options
 - Customizable saving and printing of profiling reports
-- JSON and TXT output formats
+- JSON and tabular output formats
 - Easy integration with existing code
 
 ## Installation
 
-To use the Advanced Flexible Profiler, clone this repository and include the `improved_profiler.py` and `profiler_config.py` files in your project directory.
+To use the Advanced Flexible Profiler, clone this repository and include the necessary files in your project directory.
 
 ```bash
-git clone https://github.com/tariq659891/omniprofiler.git
+git clone https://github.com/yourusername/advanced-flexible-profiler.git
+```
+
+Make sure to install the required dependencies:
+
+```bash
+pip install line_profiler tabulate
 ```
 
 ## Usage
@@ -35,13 +41,9 @@ from profiler_config import profiler_config
 
 ```python
 profiler_config.enabled = True
-profiler_config.output_dir = "profiling_output"
-profiler_config.save_format = "json"
-profiler_config.steps_to_save = [1, 100, 1000]
+profiler_config.print_line_profile = True
 profiler_config.print_block_profile = True
-profiler_config.save_line_profile = True
-profiler_config.save_block_profile = True
-profiler_config.save_overall_profile = True
+profiler_config.print_overall_profile = True
 ```
 
 ### Profiling Examples
@@ -63,14 +65,6 @@ result = obj.process_data()
 profiler.print_overall_profile()
 ```
 
-Output:
-```
-Overall Profiling Report:
-Function Profiling:
-MyClass.__init__: Total time: 0.052341s, Calls: 1, Avg time: 0.052341s
-MyClass.process_data: Total time: 0.021567s, Calls: 1, Avg time: 0.021567s
-```
-
 #### Example 2: Profiling a Specific Block of Code
 
 ```python
@@ -86,13 +80,6 @@ my_function()
 profiler.print_block_profile()
 ```
 
-Output:
-```
-Block Profiling Report:
-my_function: Total time: 0.075231s, Calls: 1, Avg time: 0.075231s
-data_processing: Total time: 0.074123s, Calls: 1, Avg time: 0.074123s
-```
-
 #### Example 3: Line-by-Line Profiling
 
 ```python
@@ -105,82 +92,57 @@ def fibonacci(n):
 
 # Usage
 fibonacci(20)
-profiler.save_line_profile(step="fibonacci")
+profiler.print_line_profile()
 ```
-
-This will save a detailed line-by-line profiling report in the `profiling_output` directory.
-
-#### Example 4: Profiling in a Training Loop
-
-```python
-@profile_methods
-class Trainer:
-    @auto_profile_blocks
-    def train(self):
-        for epoch in range(10):
-            with profiler.profile_context(f"epoch_{epoch}"):
-                for batch in range(100):
-                    self.train_step(batch)
-                    
-                    if batch % 10 == 0:
-                        profiler.step_profiler()
-    
-    @auto_profile_blocks
-    def train_step(self, batch):
-        # Simulating a training step
-        time.sleep(0.01)
-
-# Usage
-trainer = Trainer()
-trainer.train()
-profiler.save_overall_profile(step="final")
-```
-
-This will save profiling reports at specified steps and a final overall report.
 
 ### Customizing Profiler Behavior
 
 You can customize the profiler's behavior by modifying the `profiler_config.py` file or updating the configuration in your code:
 
 ```python
-profiler_config.print_line_profile = False
+profiler_config.enabled = True
+profiler_config.print_line_profile = True
 profiler_config.print_block_profile = True
 profiler_config.print_overall_profile = True
-profiler_config.save_format = "txt"
-profiler_config.steps_to_save = [1, 50, 100]
 ```
 
 ## Advanced Usage
 
-### Saving Custom Profiles
+### Getting Profiling Data
 
-You can save custom profiles at any point in your code:
+You can get profiling data programmatically:
 
 ```python
-profiler.save_block_profile(step="custom_step", filename="custom_block_profile.json")
-profiler.save_line_profile(step="custom_step", filename="custom_line_profile.txt")
-profiler.save_overall_profile(step="custom_step", filename="custom_overall_profile.json")
+line_profile_data = profiler.get_line_profile()
+block_profile_data = profiler.get_block_profile()
+overall_profile_data = profiler.get_overall_profile()
 ```
 
-### Resetting the Profiler
+### Printing Profiling Reports
 
-If you want to reset the profiler's data:
+The profiler provides methods to print different types of profiling reports:
 
 ```python
-profiler.reset()
+profiler.print_line_profile()
+profiler.print_block_profile()
+profiler.print_overall_profile()
 ```
 
 ## Best Practices
 
 1. Use `@profile_methods` for classes where you want to profile all methods.
-2. Use `@auto_profile_blocks` for individual functions you want to profile.
-3. Use `with profiler.profile_context("name"):` for profiling specific blocks of code.
-4. Call `profiler.step_profiler()` regularly in loops to save and print reports at specified steps.
-5. Use `profiler.save_*_profile()` and `profiler.print_*_profile()` methods for custom profiling actions.
+2. Use `@profile_line_by_line` for functions where you need detailed line-by-line profiling.
+3. Use `@auto_profile_blocks` for individual functions you want to profile.
+4. Use `with profiler.profile_context("name"):` for profiling specific blocks of code.
+5. Configure the profiler using `profiler_config` to control what data is collected and displayed.
 
 ## Contributing
 
 Contributions to the Advanced Flexible Profiler are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgements
+
+Special thanks to the creators of the `line_profiler` package, which forms the backbone of our line-by-line profiling functionality. Their work has been instrumental in making this profiler possible.
 
 ## License
 
