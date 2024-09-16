@@ -17,9 +17,7 @@ The Advanced Flexible Profiler is a powerful and customizable profiling tool des
 To use the Advanced Flexible Profiler, clone this repository and include the `improved_profiler.py` and `profiler_config.py` files in your project directory.
 
 ```bash
-git clone https://github.com/yourusername/advanced-flexible-profiler.git
-cd advanced-flexible-profiler
-cp improved_profiler.py profiler_config.py /path/to/your/project/
+git clone https://github.com/tariq659891/omniprofiler.git
 ```
 
 ## Usage
