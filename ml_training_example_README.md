@@ -1,7 +1,5 @@
 # Omni Profiler
 
-[Previous content remains the same up to the Machine Learning Example section]
-
 ## Machine Learning Example
 
 Omni Profiler can be particularly useful for profiling machine learning workflows. Here's an example of how to use Omni Profiler with a PyTorch-based neural network training process.
