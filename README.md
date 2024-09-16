@@ -1,6 +1,6 @@
-# Advanced Flexible Profiler
+# Omni Profiler
 
-The Advanced Flexible Profiler is a powerful and customizable profiling tool designed to help you analyze and optimize your Python code. It provides granular control over profiling different aspects of your code, including function-level profiling, block profiling, and line-by-line profiling.
+Omni Profiler is a powerful and flexible profiling tool designed to help you analyze and optimize your Python code. It provides granular control over profiling different aspects of your code, including function-level profiling, block profiling, and line-by-line profiling.
 
 ## Features
 
@@ -8,16 +8,16 @@ The Advanced Flexible Profiler is a powerful and customizable profiling tool des
 - Block profiling
 - Line-by-line profiling
 - Flexible configuration options
-- Customizable saving and printing of profiling reports
-- JSON and tabular output formats
+- Customizable printing of profiling reports
+- Tabular output format
 - Easy integration with existing code
 
 ## Installation
 
-To use the Advanced Flexible Profiler, clone this repository and include the necessary files in your project directory.
+To use Omni Profiler, clone this repository and include the necessary files in your project directory.
 
 ```bash
-git clone https://github.com/yourusername/advanced-flexible-profiler.git
+git clone https://github.com/yourusername/omni-profiler.git
 ```
 
 Make sure to install the required dependencies:
@@ -33,7 +33,7 @@ pip install line_profiler tabulate
 1. Import the profiler in your Python script:
 
 ```python
-from improved_profiler import profiler, profile_methods, profile_line_by_line, auto_profile_blocks
+from omni_profiler import profiler, profile_methods, profile_line_by_line, auto_profile_blocks
 from profiler_config import profiler_config
 ```
 
@@ -136,9 +136,22 @@ profiler.print_overall_profile()
 4. Use `with profiler.profile_context("name"):` for profiling specific blocks of code.
 5. Configure the profiler using `profiler_config` to control what data is collected and displayed.
 
+## Future Work
+
+We have exciting plans to enhance Omni Profiler in the future:
+
+1. Implement saving functionality to store profiling results in various formats (JSON, CSV, etc.).
+2. Add support for asynchronous code profiling.
+3. Develop a graphical user interface for easier visualization of profiling results.
+4. Integrate with popular IDEs for seamless profiling experience.
+5. Implement memory profiling capabilities.
+6. Add support for distributed system profiling.
+
+Stay tuned for these upcoming features!
+
 ## Contributing
 
-Contributions to the Advanced Flexible Profiler are welcome! Please feel free to submit a Pull Request.
+Contributions to Omni Profiler are welcome! Please feel free to submit a Pull Request.
 
 ## Acknowledgements
 
