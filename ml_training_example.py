@@ -12,16 +12,17 @@ profiler_config.output_dir = "ml_profiling_output"
 profiler_config.save_format = "json"
 profiler_config.steps_to_save = [1, 10, 50, 100]
 profiler_config.print_block_profile = True
-profiler_config.save_line_profile = True
-profiler_config.save_block_profile = True
-profiler_config.save_overall_profile = True
+profiler_config.print_line_profile = True
+profiler_config.print_overall_profile = True
+
 
 # Generate dummy data
-@auto_profile_blocks
+@profile_line_by_line
 def generate_data(num_samples=1000, input_dim=10):
     X = np.random.randn(num_samples, input_dim)
     y = np.sum(X, axis=1) > 0
     return torch.FloatTensor(X), torch.FloatTensor(y).unsqueeze(1)
+
 
 # Define a simple neural network
 class SimpleNN(nn.Module):
@@ -29,11 +30,12 @@ class SimpleNN(nn.Module):
         super(SimpleNN, self).__init__()
         self.fc1 = nn.Linear(input_dim, 64)
         self.fc2 = nn.Linear(64, 1)
-        
+
     def forward(self, x):
         x = torch.relu(self.fc1(x))
         x = torch.sigmoid(self.fc2(x))
         return x
+
 
 @profile_methods
 class Trainer:
@@ -43,8 +45,8 @@ class Trainer:
         self.optimizer = optimizer
         self.train_loader = train_loader
         self.val_loader = val_loader
-    
-    @auto_profile_blocks
+
+    @profile_line_by_line
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
@@ -56,14 +58,13 @@ class Trainer:
                 loss.backward()
                 self.optimizer.step()
                 total_loss += loss.item()
-            
+
             if batch_idx % 10 == 0:
                 print(f'Epoch {epoch}, Batch {batch_idx}, Loss: {loss.item():.4f}')
-                profiler.step_profiler()
-        
+
         return total_loss / len(self.train_loader)
-    
-    @auto_profile_blocks
+
+    @profile_line_by_line
     def validate(self):
         self.model.eval()
         total_loss = 0
@@ -73,7 +74,7 @@ class Trainer:
                 loss = self.criterion(output, target)
                 total_loss += loss.item()
         return total_loss / len(self.val_loader)
-    
+
     @profile_line_by_line
     def train(self, num_epochs):
         for epoch in range(num_epochs):
@@ -81,27 +82,27 @@ class Trainer:
                 train_loss = self.train_epoch(epoch)
                 val_loss = self.validate()
                 print(f'Epoch {epoch}: Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
-            
-            profiler.save_block_profile(step=epoch, filename=f"epoch_{epoch}_block_profile.json")
-        
-        profiler.save_overall_profile(step="final")
+
         profiler.print_overall_profile()
+        profiler.print_block_profile()
+        profiler.print_line_profile()
+
 
 # Main training script
 if __name__ == "__main__":
     # Generate data
     X_train, y_train = generate_data(1000, 10)
     X_val, y_val = generate_data(200, 10)
-    
+
     # Create data loaders
     train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=32, shuffle=True)
     val_loader = DataLoader(TensorDataset(X_val, y_val), batch_size=32)
-    
+
     # Initialize model, criterion, and optimizer
     model = SimpleNN(10)
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters())
-    
+
     # Create trainer and start training
     trainer = Trainer(model, criterion, optimizer, train_loader, val_loader)
     trainer.train(num_epochs=5)
