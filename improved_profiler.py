@@ -9,6 +9,8 @@ from line_profiler import LineProfiler
 import json
 import linecache
 
+print("Hello")
+
 class LineProfilerBasedProfiler:
     def __init__(self):
         self.line_profiler = LineProfiler()
