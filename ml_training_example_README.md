@@ -123,19 +123,19 @@ After running the training script, Omni Profiler will output detailed profiling 
 
 #### Overall Profiling Report
 
-[Image Placeholder: Overall Profiling Report]
+![Overall Profiling Report](https://raw.githubusercontent.com/yourusername/your-repo-name/main/images/overall_profiling_report.png)
 
 This image shows the overall time spent in each profiled function, giving you a high-level view of where your code is spending the most time.
 
 #### Block Profiling Report
 
-[Image Placeholder: Block Profiling Report]
+![Block Profiling Report](assets/block.png)
 
 The block profiling report provides information about the time spent in specific blocks of code, such as individual epochs or training steps.
 
 #### Line-by-Line Profiling Report
 
-[Image Placeholder: Line-by-Line Profiling Report]
+![Line-by-Line Profiling Report](https://github.com/tariq659891/omniprofiler/blob/540b4f3b08f70704420856a2b293a7bf0c2a3e7f/assets/line.png)
 
 This detailed report shows the time spent on each line of code, helping you identify specific bottlenecks in your functions.
 
