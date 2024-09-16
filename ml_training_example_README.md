@@ -1,6 +1,6 @@
 # Omni Profiler
 
-[Previous content remains the same...]
+[Previous content remains the same up to the Machine Learning Example section]
 
 ## Machine Learning Example
 
@@ -16,11 +16,14 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
-from omni_profiler import profiler, profile_methods, profile_line_by_line, auto_profile_blocks
+from improved_profiler import profiler, profile_methods, profile_line_by_line
 from profiler_config import profiler_config
 
 # Configure profiler
 profiler_config.enabled = True
+profiler_config.output_dir = "ml_profiling_output"
+profiler_config.save_format = "json"
+profiler_config.steps_to_save = [1, 10, 50, 100]
 profiler_config.print_block_profile = True
 profiler_config.print_line_profile = True
 profiler_config.print_overall_profile = True
@@ -31,7 +34,7 @@ profiler_config.print_overall_profile = True
 We'll use a simple function to generate dummy data:
 
 ```python
-@auto_profile_blocks
+@profile_line_by_line
 def generate_data(num_samples=1000, input_dim=10):
     X = np.random.randn(num_samples, input_dim)
     y = np.sum(X, axis=1) > 0
@@ -69,11 +72,11 @@ class Trainer:
         self.train_loader = train_loader
         self.val_loader = val_loader
     
-    @auto_profile_blocks
+    @profile_line_by_line
     def train_epoch(self, epoch):
         # Training logic here...
     
-    @auto_profile_blocks
+    @profile_line_by_line
     def validate(self):
         # Validation logic here...
     
@@ -86,6 +89,8 @@ class Trainer:
                 print(f'Epoch {epoch}: Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
         
         profiler.print_overall_profile()
+        profiler.print_block_profile()
+        profiler.print_line_profile()
 ```
 
 ### Main Training Script
@@ -116,23 +121,43 @@ if __name__ == "__main__":
 
 After running the training script, Omni Profiler will output detailed profiling information. Here are some example visualizations of the profiling results:
 
+#### Overall Profiling Report
+
 [Image Placeholder: Overall Profiling Report]
+
+This image shows the overall time spent in each profiled function, giving you a high-level view of where your code is spending the most time.
+
+#### Block Profiling Report
 
 [Image Placeholder: Block Profiling Report]
 
+The block profiling report provides information about the time spent in specific blocks of code, such as individual epochs or training steps.
+
+#### Line-by-Line Profiling Report
+
 [Image Placeholder: Line-by-Line Profiling Report]
 
-These visualizations help identify performance bottlenecks in your machine learning workflow, allowing you to optimize your code for better efficiency.
+This detailed report shows the time spent on each line of code, helping you identify specific bottlenecks in your functions.
 
 ## Interpreting Profiling Results
 
 When analyzing the profiling results:
 
-1. Look for functions or blocks that take the most time.
-2. Identify any unexpected patterns in the line-by-line profiling.
-3. Pay attention to the number of calls for each function or block.
-4. Compare the average time per call to identify slow operations.
+1. Look for functions or blocks that take the most time in the overall and block profiling reports.
+2. Identify any unexpected patterns in the line-by-line profiling report, such as lines that take significantly longer than others.
+3. Pay attention to the number of calls for each function or block to understand how frequently they're executed.
+4. Compare the average time per call to identify slow operations that might benefit from optimization.
 
 By using Omni Profiler in your machine learning projects, you can gain valuable insights into the performance characteristics of your training process, helping you optimize your code for faster execution and better resource utilization.
+
+## Customizing Profiler Output
+
+You can customize the profiler's output by modifying the `profiler_config` settings:
+
+- Use `profiler_config.print_overall_profile = True/False` to enable/disable the overall profiling report.
+- Use `profiler_config.print_block_profile = True/False` to enable/disable the block profiling report.
+- Use `profiler_config.print_line_profile = True/False` to enable/disable the line-by-line profiling report.
+
+Experiment with these settings to focus on the level of detail you need for your specific profiling tasks.
 
 [Rest of the README remains the same...]
